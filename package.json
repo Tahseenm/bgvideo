@@ -1,0 +1,102 @@
+{
+  "name": "bgvideo",
+  "version": "0.0.1",
+  "description": "A lightweight feature rich javascript background video library",
+  "main": "lib/index.js",
+  "module": "es/index.js",
+  "jsnext:main": "es/index.js",
+  "files": [
+    "es",
+    "lib",
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "precommit": "lint-staged",
+    "cz-commit": "git-cz",
+    "size": "node -e \"process.stdout.write('\\033c\\u001b[1mGzip size: ')\" && gzip-size dist/bgvideo.min.js",
+    "lint": "eslint src test",
+    "test": "cross-env BABEL_ENV=dev jest",
+    "test:watch": "npm test -- --watch",
+    "test:coverage": "npm test -- --coverage",
+    "validate": "npm run lint && npm run test:coverage",
+    "postvalidate": "node -e \"console.log('\\033c\\u001b[32m\\u001b[1mValidation(Lint + Tests) successful\\u001b[0m')\"",
+    "clean": "rimraf lib es dist coverage",
+    "prebuild": "npm run clean && npm run validate",
+    "build": "npm-run-all --parallel build:**",
+    "postbuild": "npm run size",
+    "build:commonjs": "cross-env BABEL_ENV=lib babel src --out-dir lib --copy-files --ignore __mocks__",
+    "build:es": "cross-env BABEL_ENV=es  babel src --out-dir es  --copy-files --ignore __mocks__",
+    "build:umd": "cross-env BABEL_ENV=es NODE_ENV=development rollup --config",
+    "build:umd:min": "cross-env BABEL_ENV=es NODE_ENV=production  rollup --config"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Tahseenm/bgvideo.git"
+  },
+  "keywords": [
+    "background video",
+    "video",
+    "cover video"
+  ],
+  "author": "Tahseen Malik <hello@tahseen.me> (https://tahseenmalik.com/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Tahseenm/bgvideo/issues"
+  },
+  "homepage": "https://github.com/Tahseenm/bgvideo#readme",
+  "engines": {
+    "node": "8.x",
+    "npm": "5.x"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-jest": "^21.2.0",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "commitizen": "^2.9.6",
+    "cross-env": "^5.1.1",
+    "cz-conventional-changelog": "^2.1.0",
+    "eslint": "^4.11.0",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.8.0",
+    "gzip-size-cli": "^2.1.0",
+    "husky": "^0.14.3",
+    "jest": "^21.2.1",
+    "jsdom": "^11.4.0",
+    "lint-staged": "^5.0.0",
+    "npm-run-all": "^4.1.2",
+    "rimraf": "^2.6.2",
+    "rollup": "^0.51.8",
+    "rollup-plugin-babel": "^3.0.2",
+    "rollup-plugin-uglify": "^2.0.1"
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
+  },
+  "lint-staged": {
+    "*.js": "eslint"
+  },
+  "jest": {
+    "testRegex": "(/test/unit/.*\\.spec.js)$",
+    "testEnvironment": "node",
+    "setupFiles": [
+      "<rootDir>/test/unit/setupTests.js"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 90,
+        "functions": 90,
+        "lines": 90,
+        "statements": 90
+      }
+    },
+    "coveragePathIgnorePatterns": [
+      "<rootDir>/test/unit/setupTests.js",
+      "<rootDir>/test/unit/windowMock.js",
+      "<rootDir>/test/unit/helpers"
+    ]
+  }
+}

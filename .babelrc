@@ -1,0 +1,22 @@
+{
+  "env": {
+    "dev": {
+      "presets": [
+        ["env", {"targets": {"node": "current"}}]
+      ],
+      "plugins": ["transform-object-rest-spread"]
+    },
+
+    "lib": {
+      "presets": ["env"],
+      "plugins": ["transform-object-rest-spread"]
+    },
+
+    "es": {
+      "presets": [
+        ["env", {"modules": false}]
+      ],
+      "plugins": ["transform-object-rest-spread"]
+    }
+  }
+}
