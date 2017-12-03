@@ -21,11 +21,31 @@
 - :white_check_mark: Accessibility
 - :white_check_mark: ES6+
 
+<p>&nbsp;</p><!-- Spacing -->
 
 ```javascript
 import BgVideo from 'bgvideo'
 
-BgVideo('#banner', 'https://example.com/timelapse.mp4')
+/**
+ * Basic example
+ */
+BgVideo('#banner', 'https://example.com/assets/timelapse.mp4')
+
+
+/**
+ * Recommended minimum
+ */
+const src = {
+  mp4:  'https://example.com/assets/timelapse.mp4',
+  webm: 'https://example.com/assets/timelapse.webm',
+}
+
+const options = {
+  backgroundColor: '#00012b',
+  backgroundImage: 'https://example.com/assets/timelapse-poster.jpg',
+}
+
+BgVideo('#banner', src, options)
 ```
 
 <p>&nbsp;</p><!-- Spacing -->
