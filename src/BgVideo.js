@@ -26,29 +26,32 @@ import { required, createID, prepend } from './utils/index'
    - Plays backward when rate < 0
    - Slowed down    when 0 < rate < 1
    - Speeded up     when rate > 1
- [2]. When fallback is not provided fallback color will be used until video is
+ [2]. When image is not provided fallback color will be used until video is
  ready to play.
- [3]. New iOS devices (version 10+) have started to play videos inline so
+ [3]. Like CSS background-position; move the background video inside the container.
+ Unlike CSS it has a default position of `center` (50% 50%) & not `left top`.
+ [4]. New iOS devices (version 10+) have started to play videos inline so
  background video is played on these mobile devices by default unless set to false.
- [4]. For accessibility, background videos will not play for users who prefer
+ [5]. For accessibility, background videos will not play for users who prefer
  reduced motion by default. It is safe to assume that given video will cause
  distress to such users. This setting is avaible to users using iOS & mac devices.
- [5]. Allow user to further style video wrapper or program it.
+ [6]. Allow user to further style video wrapper or program it.
  */
 
 const DEFAULT_OPTIONS = {
   loop: true,
   muted: true,
   volume: 1,
-  playbackRate: 1,             /* [1] */
+  playbackRate: 1,               /* [1] */
   backgroundColor: 'black',
-  backgroundImage: 'none',     /* [2] */
+  backgroundImage: 'none',       /* [2] */
+  backgroundPosition: 'center',  /* [3] */
   filter: 'none',
   overlay: 'transparent',
   overlayOpacity: 0.3,
-  playOnMobile: true,          /* [3] */
-  playOnReducedMotion: false,  /* [4] */
-  className: '',               /* [5] */
+  playOnMobile: true,            /* [4] */
+  playOnReducedMotion: false,    /* [5] */
+  className: '',                 /* [6] */
 }
 
 
@@ -64,14 +67,14 @@ const BgVideo = (
   options = {},
 ) => {
   const id = createID()
-  const libOptions = parseOptions(DEFAULT_OPTIONS, options)
+  const settings = parseOptions(DEFAULT_OPTIONS, options)
 
   const targetElem   = getTargetElem(target)
-  const videoWrapper = getVideoWrapperElem(libOptions)
+  const videoWrapper = getVideoWrapperElem(settings)
   prepend(videoWrapper, targetElem)
 
-  const canPlayBg = canPlayVideo(libOptions)
-  let videoElem   = canPlayBg ? getVideoElem(src, libOptions) : null
+  const canPlayBg = canPlayVideo(settings)
+  let videoElem   = canPlayBg ? getVideoElem(src, settings) : null
   if (canPlayBg) setBgVideo(videoWrapper, videoElem)
 
   const API = {
@@ -96,7 +99,7 @@ const BgVideo = (
       if (!canPlayBg) return null
 
       videoWrapper.removeChild(videoElem)
-      videoElem = getVideoElem(newVidSrc, libOptions)
+      videoElem = getVideoElem(newVidSrc, settings)
       setBgVideo(videoWrapper, videoElem)
 
       return videoElem

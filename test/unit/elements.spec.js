@@ -297,9 +297,18 @@ describe('getVideoWrapperElem()', () => {
 
 
 describe('getVideoElem()', () => {
+  const options = {
+    loop: true,
+    muted: true,
+    volume: 1,
+    playbackRate: 1,
+    backgroundPosition: { x: '50%', y: '50%' },
+    filter: 'none',
+  }
+
   it('should return a video Element', () => {
     const src = 'example.com/videos/foo.mp4'
-    const videoElem = getVideoElem(src, DEFAULT_OPTIONS)
+    const videoElem = getVideoElem(src, options)
 
     const expected = true
     const actual = videoElem instanceof $window.HTMLVideoElement
@@ -309,7 +318,7 @@ describe('getVideoElem()', () => {
 
   it('should set the source for video', () => {
     const src = 'example.com/videos/foo.mp4'
-    const videoElem = getVideoElem(src, DEFAULT_OPTIONS)
+    const videoElem = getVideoElem(src, options)
 
     const expected = src
     const actual = videoElem.src
@@ -319,7 +328,7 @@ describe('getVideoElem()', () => {
 
   it('should set the source when given as object', () => {
     const src = { mp4: 'example.com/videos/foo.mp4' }
-    const videoElem = getVideoElem(src, DEFAULT_OPTIONS)
+    const videoElem = getVideoElem(src, options)
 
     const expected = src.mp4
     const actual = videoElem.querySelector('source[type$="mp4"]').src
@@ -333,7 +342,7 @@ describe('getVideoElem()', () => {
       webm: 'example.com/videos/foo.webm',
     }
 
-    const videoElem = getVideoElem(src, DEFAULT_OPTIONS)
+    const videoElem = getVideoElem(src, options)
 
     const expected = src
     const actual = {
@@ -346,7 +355,7 @@ describe('getVideoElem()', () => {
 
   describe('Video', () => {
     it('plays playsInline for iOS 10+', () => {
-      const videoElem = getVideoElem('example.com/foo.mp4', DEFAULT_OPTIONS)
+      const videoElem = getVideoElem('example.com/foo.mp4', options)
 
       const expected = true
       const actual = videoElem.playsInline
@@ -355,7 +364,7 @@ describe('getVideoElem()', () => {
     })
 
     it('autoplays', () => {
-      const videoElem = getVideoElem('example.com/foo.mp4', DEFAULT_OPTIONS)
+      const videoElem = getVideoElem('example.com/foo.mp4', options)
 
       const expected = true
       const actual = videoElem.autoplay
@@ -365,36 +374,36 @@ describe('getVideoElem()', () => {
   })
 
   it('should set video loop', () => {
-    const videoElem = getVideoElem('example.com/foo.mp4', DEFAULT_OPTIONS)
+    const videoElem = getVideoElem('example.com/foo.mp4', options)
 
-    const expected = DEFAULT_OPTIONS.loop
+    const expected = options.loop
     const actual = videoElem.loop
 
     expect(actual).toEqual(expected)
   })
 
   it('should set the video volume', () => {
-    const videoElem = getVideoElem('example.com/foo.mp4', DEFAULT_OPTIONS)
+    const videoElem = getVideoElem('example.com/foo.mp4', options)
 
-    const expected = DEFAULT_OPTIONS.volume
+    const expected = options.volume
     const actual = videoElem.volume
 
     expect(actual).toEqual(expected)
   })
 
   it('should set the video mute', () => {
-    const videoElem = getVideoElem('example.com/foo.mp4', DEFAULT_OPTIONS)
+    const videoElem = getVideoElem('example.com/foo.mp4', options)
 
-    const expected = DEFAULT_OPTIONS.muted
+    const expected = options.muted
     const actual = videoElem.defaultMuted
 
     expect(actual).toEqual(expected)
   })
 
   it('should set the video playbackRate', () => {
-    const videoElem = getVideoElem('example.com/foo.mp4', DEFAULT_OPTIONS)
+    const videoElem = getVideoElem('example.com/foo.mp4', options)
 
-    const expected = DEFAULT_OPTIONS.playbackRate
+    const expected = options.playbackRate
     const actual = videoElem.defaultPlaybackRate
 
     expect(actual).toEqual(expected)
@@ -402,18 +411,36 @@ describe('getVideoElem()', () => {
 
   describe('video Element styles', () => {
     it('should contain postioned styles', () => {
-      const videoElem = getVideoElem('example.com/foo.mp4', DEFAULT_OPTIONS)
+      const videoElem = getVideoElem('example.com/foo.mp4', options)
+      const styles = ['position', 'top', 'left', 'transform']
 
-      const styles = {
-        position: 'absolute',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
+      /** Given property of style returns empty string if not set */
+      for (const styleProp of styles) {
+        const expected = true
+        const actual = videoElem.style[styleProp] !== ''
+
+        expect(actual).toEqual(expected)
+      }
+    })
+
+    it('should contain the correct positioned styles using `options.backgroundPosition`', () => {
+      /** backgroundPosition -> 'right top' */
+      const $options = {
+        ...options,
+        backgroundPosition: { x: '100%', y: '0%' },
       }
 
-      for (const prop of Object.keys(styles)) {
-        const expected = styles[prop]
-        const actual = videoElem.style[prop]
+      const videoElem = getVideoElem('example.com/foo.mp4', $options)
+      const styles = {
+        position: 'absolute',
+        top: '0%',
+        left: '100%',
+        transform: 'translate(-100%, -0%)',
+      }
+
+      for (const styleProp of Object.keys(styles)) {
+        const expected = styles[styleProp]
+        const actual = videoElem.style[styleProp]
 
         expect(actual).toEqual(expected)
       }
@@ -425,7 +452,7 @@ describe('getVideoElem()', () => {
           opacity,
           visibility,
         },
-      } = getVideoElem('example.com/foo.mp4', DEFAULT_OPTIONS)
+      } = getVideoElem('example.com/foo.mp4', options)
 
       const expected = true
       const actual = opacity === '0' && visibility === 'hidden'
@@ -434,11 +461,6 @@ describe('getVideoElem()', () => {
     })
 
     it('should contain given filter styles', () => {
-      const options = {
-        ...DEFAULT_OPTIONS,
-        filter: 'blur(3px) grayscale(0.5)',
-      }
-
       const videoElem = getVideoElem('example.com/foo.mp4', options)
 
       const expected = options.filter

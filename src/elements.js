@@ -89,6 +89,7 @@ const getVideoElem = (src, {
   muted,
   volume,
   playbackRate,
+  backgroundPosition,
   filter,
 }) => {
   const video = document.createElement('video')
@@ -114,13 +115,19 @@ const getVideoElem = (src, {
   video.defaultPlaybackRate = playbackRate
   video.playbackRate        = playbackRate
 
+
+  const {
+    x,
+    y,
+  } = backgroundPosition
+
   /** Will become visible when video is ready to play */
   video.setAttribute('style', `
     position: absolute;
-    top: 50%; left: 50%;
-    -webkit-transform: translate(-50%, -50%);
-        -ms-transform: translate(-50%, -50%);
-            transform: translate(-50%, -50%);
+    top: ${y}; left: ${x};
+    -webkit-transform: translate(-${x}, -${y});
+        -ms-transform: translate(-${x}, -${y});
+            transform: translate(-${x}, -${y});
     visibility: hidden;
     opacity: 0;
     filter: ${filter};`)

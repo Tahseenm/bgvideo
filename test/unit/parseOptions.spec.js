@@ -1,4 +1,9 @@
-import parseOptions, { parseBgImage, parseFilter } from '../../src/parseOptions'
+import parseOptions, {
+  parseBgImage,
+  parseBgPosition,
+  parseFilter,
+} from '../../src/parseOptions'
+
 import { DEFAULT_OPTIONS } from '../../src/BgVideo'
 
 
@@ -17,6 +22,53 @@ describe('parseBgImage()', () => {
 
     const expected = input
     const actual = parseBgImage(input)
+
+    expect(actual).toEqual(expected)
+  })
+})
+
+
+describe('parseBgPosition()', () => {
+  it('should return a object with x & y properties', () => {
+    const result = parseBgPosition('left top')
+
+    const expected = true
+    const actual = 'x' in result && 'y' in result
+
+    expect(actual).toEqual(expected)
+  })
+
+  it('should return the correct x & y position', () => {
+    const expected = { x: '0%', y: '0%' }
+    const actual = parseBgPosition('left top')
+
+    expect(actual).toEqual(expected)
+  })
+
+  it('should handle a single keyword position', () => {
+    const expected = { x: '100%', y: '50%' }
+    const actual = parseBgPosition('right')
+
+    expect(actual).toEqual(expected)
+  })
+
+  it('should parse string with multiple spaces', () => {
+    const expected = { x: '0%', y: '0%' }
+    const actual = parseBgPosition('     left       top   ')
+
+    expect(actual).toEqual(expected)
+  })
+
+  it('should parse keywords with uppercase characters', () => {
+    const expected = { x: '0%', y: '0%' }
+    const actual = parseBgPosition('Left TOP')
+
+    expect(actual).toEqual(expected)
+  })
+
+  it('should parse custom percentage position', () => {
+    const expected = { x: '25%', y: '25%' }
+    const actual = parseBgPosition('25% 25%')
 
     expect(actual).toEqual(expected)
   })
@@ -60,17 +112,41 @@ describe('parseFilter()', () => {
 
 describe('parseOptions()', () => {
   it('should return default options when given empty options', () => {
-    const expected = DEFAULT_OPTIONS
+    const expected = {
+      ...DEFAULT_OPTIONS,
+      backgroundPosition: { x: '50%', y: '50%' },
+    }
+
     const actual = parseOptions(DEFAULT_OPTIONS, {})
+
+    expect(actual).toEqual(expected)
+  })
+
+  it('should merge given options with default options', () => {
+    const options = {
+      loop: false,
+      muted: false,
+      volume: 0.25,
+      playbackRate: 1.5,
+      playOnMobile: false,
+      playOnReducedMotion: true,
+    }
+
+    const expected = {
+      ...DEFAULT_OPTIONS,
+      backgroundPosition: { x: '50%', y: '50%' },
+      ...options,
+    }
+
+    const actual = parseOptions(DEFAULT_OPTIONS, options)
 
     expect(actual).toEqual(expected)
   })
 
   it('should parse library options which need parsing', () => {
     const options = {
-      muted: false,
-      backgroundColor: '#fff',
       backgroundImage: 'https://example.com/foo.jpg',
+      backgroundPosition: 'left top',
       filter: {
         blur: '3px',
       },
@@ -78,9 +154,8 @@ describe('parseOptions()', () => {
 
     const expected = {
       ...DEFAULT_OPTIONS,
-      muted: false,
-      backgroundColor: '#fff',
       backgroundImage: parseBgImage('https://example.com/foo.jpg'),
+      backgroundPosition: parseBgPosition('left top'),
       filter: parseFilter({ blur: '3px' }),
     }
 
